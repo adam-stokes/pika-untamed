@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+
+
+# ABSTRACT: pika cli
+
+use Pika;
+Pika->run;

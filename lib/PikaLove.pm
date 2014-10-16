@@ -1,6 +1,6 @@
-package Pika;
+package PikaLove;
 
-# ABSTRACT: my tiny bot
+# ABSTRACT: my pika loves you
 
 use strict;
 use warnings;
@@ -10,6 +10,7 @@ use feature ();
 use autobox;
 use autobox::Core;
 use Method::Signatures;
+use true;
 use Import::Into;
 use App::Cmd::Setup -app;
 
@@ -25,6 +26,7 @@ sub import {
     'boolean'->import::into($target, ':all');
     'autobox'->import::into($target);
     'autobox::Core'->import::into($target);
+    'true'->import::into($target);
     Method::Signatures->import::into($target, qw(method func));
 }
 
