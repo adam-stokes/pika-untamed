@@ -10,17 +10,30 @@ use ExtUtils::MakeMaker ;
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Pika is ...",
+  "ABSTRACT" => "my tiny bot",
   "AUTHOR" => "Adam Stokes <adamjs\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Pika",
-  "EXE_FILES" => [],
+  "EXE_FILES" => [
+    "bin/pika"
+  ],
   "LICENSE" => "perl",
   "NAME" => "Pika",
   "PREREQ_PM" => {
+    "App::Cmd::Setup" => 0,
+    "Import::Into" => 0,
+    "Method::Signatures" => 0,
+    "Moo" => 0,
+    "autobox" => 0,
+    "autobox::Core" => 0,
+    "boolean" => 0,
+    "feature" => 0,
+    "namespace::clean" => 0,
     "strict" => 0,
+    "true" => 0,
+    "utf8::all" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -34,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::NoTabs" => 0
   },
-  "VERSION" => "0.0.1",
+  "VERSION" => "0.0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,16 +55,27 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "App::Cmd::Setup" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Import::Into" => 0,
+  "Method::Signatures" => 0,
+  "Moo" => 0,
   "Test::Compile" => 0,
   "Test::Kwalitee" => 0,
   "Test::Mojo" => 0,
   "Test::More" => 0,
   "Test::NoTabs" => 0,
+  "autobox" => 0,
+  "autobox::Core" => 0,
+  "boolean" => 0,
+  "feature" => 0,
+  "namespace::clean" => 0,
   "strict" => 0,
+  "true" => 0,
+  "utf8::all" => 0,
   "warnings" => 0
 );
 

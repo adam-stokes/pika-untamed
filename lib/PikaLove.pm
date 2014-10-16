@@ -11,8 +11,8 @@ use autobox;
 use autobox::Core;
 use Method::Signatures;
 use true;
+use Carp;
 use Import::Into;
-use App::Cmd::Setup -app;
 
 sub import {
     my $target = caller;
@@ -27,7 +27,8 @@ sub import {
     'autobox'->import::into($target);
     'autobox::Core'->import::into($target);
     'true'->import::into($target);
-    Method::Signatures->import::into($target, qw(method func));
+    'Carp'->import::into($target, qw(confess croak));
+    Method::Signatures->import::into($target);
 }
 
 1;

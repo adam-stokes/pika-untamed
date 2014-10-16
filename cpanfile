@@ -1,4 +1,15 @@
+requires "App::Cmd::Setup" => "0";
+requires "Import::Into" => "0";
+requires "Method::Signatures" => "0";
+requires "Moo" => "0";
+requires "autobox" => "0";
+requires "autobox::Core" => "0";
+requires "boolean" => "0";
+requires "feature" => "0";
+requires "namespace::clean" => "0";
 requires "strict" => "0";
+requires "true" => "0";
+requires "utf8::all" => "0";
 requires "warnings" => "0";
 
 on 'test' => sub {
