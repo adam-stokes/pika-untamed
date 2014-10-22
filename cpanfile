@@ -1,16 +1,13 @@
-requires "App::Cmd::Setup" => "0";
-requires "Import::Into" => "0";
-requires "Method::Signatures" => "0";
-requires "Moo" => "0";
-requires "autobox" => "0";
-requires "autobox::Core" => "0";
-requires "boolean" => "0";
-requires "feature" => "0";
-requires "namespace::clean" => "0";
-requires "strict" => "0";
-requires "true" => "0";
-requires "utf8::all" => "0";
-requires "warnings" => "0";
+requires "AnyEvent" => "0";
+requires "AnyEvent::IRC::Client" => "0";
+requires "Moose" => "0";
+requires "Moose::Util::TypeConstraints" => "0";
+requires "MooseX::App::Cmd" => "0";
+requires "MooseX::App::Cmd::Command" => "0";
+requires "MooseX::Role::Pluggable::Plugin" => "0";
+requires "MooseX::SimpleConfig" => "0";
+requires "Quick::Perl" => "0";
+requires "namespace::autoclean" => "0";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
@@ -23,6 +20,8 @@ on 'test' => sub {
   requires "Test::More" => "0";
   requires "Test::NoTabs" => "0";
   requires "perl" => "5.006";
+  requires "strict" => "0";
+  requires "warnings" => "0";
 };
 
 on 'test' => sub {
@@ -31,6 +30,7 @@ on 'test' => sub {
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
+  requires "File::ShareDir::Install" => "0.06";
 };
 
 on 'develop' => sub {

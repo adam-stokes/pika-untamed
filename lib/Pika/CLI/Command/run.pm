@@ -21,12 +21,11 @@ around _usage_format => sub {
     return "usage: %c %o (run 'perldoc " . __PACKAGE__ . "' for more info)";
 };
 
-sub config_any_args {
+func config_any_args {
     return {driver_args => {General => {-LowerCaseNames => 1,}}};
 }
 
-sub execute {
-    my ($self, $opt, $args) = @_;
+method execute($opt, $args) {
     my $pika = Pika->new(config => $self->config);
     $pika->run;
 }

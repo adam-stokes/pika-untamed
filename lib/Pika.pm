@@ -4,23 +4,24 @@ package Pika;
 
 use Quick::Perl;
 use Moose;
-use Pika::Connection;
 use AnyEvent;
-use App::Cmd::Setup -app;
+use Pika::Connection;
 use namespace::autoclean;
 
 const our $DEBUG => $ENV{PERL_PIKA_DEBUG};
 
 has condvar => (
-    is         => 'ro',
-    lazy_build => 1
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_condvar'
 );
 
 has connections => (
-    is         => 'ro',
-    isa        => 'ArrayRef[Pika::Connection]',
-    lazy_build => 1,
-    handles    => {
+    is      => 'ro',
+    isa     => 'ArrayRef[Pika::Connection]',
+    lazy    => 1,
+    builder => '_build_connections',
+    handles => {
         all_connections => 'elements',
         push_connection => 'push'
     }
@@ -39,7 +40,7 @@ method _build_connections {
     while (my ($name, $conn) = each %{$self->{config}{connection}}) {
         confess "No network specified for connection '$name'"
           unless $conn->{network};
-        print "Connection Name: $name\n" if $Pika::DEBUG;
+        say "Loading connection: $name\n" if $Pika::DEBUG;
 
         my $network    = $self->{config}{network}->{$conn->{network}};
         my $connection = Pika::Connection->new(
@@ -49,7 +50,6 @@ method _build_connections {
         );
         push @connections, $connection;
     }
-
     return \@connections;
 }
 
