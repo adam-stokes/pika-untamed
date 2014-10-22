@@ -2,15 +2,12 @@ package Pika;
 
 # ABSTRACT: my tiny bot
 
-use PikaLove;
+use Quick::Perl;
+use Moose;
 use Pika::Connection;
-
 use AnyEvent;
-use Const::Fast;
-use Types::Standard qw(ArrayRef HashRef);
 use App::Cmd::Setup -app;
-use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 const our $DEBUG => $ENV{PERL_PIKA_DEBUG};
 
@@ -30,7 +27,8 @@ has connections => (
 );
 
 has config => (
-    is       => 'ro' isa => 'HashRef',
+    is       => 'ro',
+    isa      => 'HashRef',
     required => 1
 );
 
@@ -63,3 +61,5 @@ method run {
     }
     $cv->recv;
 }
+
+__PACKAGE__->meta->make_immutable;

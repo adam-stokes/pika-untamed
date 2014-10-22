@@ -2,24 +2,23 @@ package Pika::Connection;
 
 # ABSTRACT: IRC Connection
 
-use PikaLove;
+use Quick::Perl;
+use Moose;
 use AnyEvent::IRC::Client;
-use Const::Fast;
-use Type::Utils qw(class_type);
-use Types::Standard qw(Str ClassName HashRef ArrayRef);
-use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 const my $IRC_DEFAULT_PORT => 6667;
 
 has irc => (
-    is  => 'rw',
-    isa => class_type('AnyEvent::IRC::Client')
+    is      => 'rw',
+    isa     => 'AnyEvent::IRC::Client',
+    handles => {send_srv => 'send_srv'}
 );
+
 
 has nickname => (
     is       => 'ro',
-    isa      => Str,
+    isa      => 'Str',
     required => 1
 );
 
@@ -30,25 +29,25 @@ has password => (
 
 has port => (
     is      => 'ro',
-    isa     => Str,
+    isa     => 'Str',
     default => $IRC_DEFAULT_PORT,
 );
 
 has server => (
     is       => 'ro',
-    isa      => Str,
+    isa      => 'Str',
     required => 1
 );
 
 has username => (
     is         => 'ro',
-    isa        => Str,
+    isa        => 'Str',
     lazy_build => 1
 );
 
 has channels => (
     is  => 'ro',
-    isa => ArrayRef[Str],
+    isa => 'ArrayRef[Str]',
 );
 
 # plugin's preference from configfle,
@@ -57,84 +56,94 @@ has 'plugin' => (
     traits  => ['Hash'],
     is      => 'ro',
     isa     => 'HashRef',
-    handles => {get_args => 'get',},
+    handles => {get_args => 'get'},
 );
 
-sub _build_username { $_[0]->nickname }
+method _build_username { $self->nickname }
 
-sub run {
-	my $self = shift;
-	foreach my $plugin (@{ $self->plugin_list }) { # WARNING: DO NOT CHANGE: plugin_list is lazy_build. it means initialize all the plugins at here.
-		$plugin->init($self);
-	}
+method run {
+    foreach my $plugin (@{$self->plugin_list})
+    { # WARNING: DO NOT CHANGE: plugin_list is lazy_build. it means initialize all the plugins at here.
+        $plugin->init($self);
+    }
 
-	my $irc = AnyEvent::IRC::Client->new();
-	$self->irc($irc);
+    my $irc = AnyEvent::IRC::Client->new();
+    $self->irc($irc);
 
-	$irc->reg_cb(disconnect => sub { $self->occur_event('on_disconnect'); });
-	$irc->reg_cb(connect => sub {
-		my ($con, $err) = @_;
-		if (defined $err) {
-			warn "connect error: $err\n";
-			return;
-		}
+    $irc->reg_cb(disconnect => sub { $self->occur_event('on_disconnect'); });
+    $irc->reg_cb(
+        connect => sub {
+            my ($con, $err) = @_;
+            if (defined $err) {
+                warn "connect error: $err\n";
+                return;
+            }
 
-		warn "connected to: " . $self->server . ":" . $self->port if $Pika::DEBUG;
-		$self->occur_event('on_connect');
-	});
+            warn "connected to: " . $self->server . ":" . $self->port
+              if $Pika::DEBUG;
+            $self->occur_event('on_connect');
+        }
+    );
 
-	$irc->reg_cb(irc_privmsg => sub {
-		my ($con, $raw) = @_;
-		my $message = Horris::Message->new(
-			channel => $raw->{params}->[0], 
-			message => $raw->{params}->[1], 
-			from	=> $raw->{prefix}
-		);
+    $irc->reg_cb(
+        irc_privmsg => sub {
+            my ($con, $raw) = @_;
+            my $message = Horris::Message->new(
+                channel => $raw->{params}->[0],
+                message => $raw->{params}->[1],
+                from    => $raw->{prefix}
+            );
 
-		$self->occur_event('irc_privmsg', $message) if $message->from->nickname ne $self->nickname; # loop guard
-	});
+            $self->occur_event('irc_privmsg', $message)
+              if $message->from->nickname ne $self->nickname;    # loop guard
+        }
+    );
 
-	$irc->reg_cb(privatemsg => sub {
-		my ($con, $nick, $raw) = @_;
-		my $message = Horris::Message->new(
-			channel => '', 
-			message => $raw->{params}->[1], 
-			from    => defined $raw->{prefix} ? $raw->{prefix} : '', 
-		);
-		$self->occur_event('on_privatemsg', $nick, $message);
-	});
+    $irc->reg_cb(
+        privatemsg => sub {
+            my ($con, $nick, $raw) = @_;
+            my $message = Horris::Message->new(
+                channel => '',
+                message => $raw->{params}->[1],
+                from    => defined $raw->{prefix} ? $raw->{prefix} : '',
+            );
+            $self->occur_event('on_privatemsg', $nick, $message);
+        }
+    );
 
-	$irc->connect($self->server, $self->port, {
-		nick => $self->nickname,
-		user => $self->username,
-		password => $self->password,
-		timeout => 1,
-	});
+    $irc->connect(
+        $self->server,
+        $self->port,
+        {   nick     => $self->nickname,
+            user     => $self->username,
+            password => $self->password,
+            timeout  => 1,
+        }
+    );
 }
 
-sub irc_notice {
-    my ($self, $args) = @_;
+method irc_notice ($args) {
     $self->send_srv(NOTICE => $args->{channel} => $args->{message});
 }
 
-sub irc_privmsg {
-    my ($self, $args) = @_;
+method irc_privmsg ($args) {
     $self->send_srv(PRIVMSG => $args->{channel} => $args->{message});
 }
 
-sub irc_mode {
-    my ($self, $args) = @_;
+method irc_mode ($args) {
     $self->send_srv(MODE => $args->{channel} => $args->{mode}, $args->{who});
 }
 
-sub occur_event {
-	my ($self, $event, @args) = @_;
-	my $plugins = $self->plugin_hash;
-	foreach my $plugin_name (@{ $self->plugins }) {
-		my $plugin = $plugins->{$plugin_name};
-		my $rev = $plugin->$event(@args) if $plugin->can($event);
+method occur_event ($event, @args) {
+    my $plugins = $self->plugin_hash;
+    my ($rev);
+    foreach my $plugin_name (@{$self->plugins}) {
+        my $plugin = $plugins->{$plugin_name};
+        $rev = $plugin->$event(@args) if $plugin->can($event);
 
-		# Don't try next plugin for $event if current plugin returns true 
-		last if defined $rev and $rev;
-	}
+        # Don't try next plugin for $event if current plugin returns true
+        last if defined $rev and $rev;
+    }
 }
+
+__PACKAGE__->meta->make_immutable;
