@@ -34,6 +34,7 @@ my %WriteMakefileArgs = (
     "Moose::Util::TypeConstraints" => 0,
     "MooseX::App::Cmd" => 0,
     "MooseX::App::Cmd::Command" => 0,
+    "MooseX::Role::Pluggable" => 0,
     "MooseX::Role::Pluggable::Plugin" => 0,
     "MooseX::SimpleConfig" => 0,
     "Quick::Perl" => 0,
@@ -52,7 +53,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0.2",
+  "VERSION" => "0.0.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,6 +72,7 @@ my %FallbackPrereqs = (
   "Moose::Util::TypeConstraints" => 0,
   "MooseX::App::Cmd" => 0,
   "MooseX::App::Cmd::Command" => 0,
+  "MooseX::Role::Pluggable" => 0,
   "MooseX::Role::Pluggable::Plugin" => 0,
   "MooseX::SimpleConfig" => 0,
   "Quick::Perl" => 0,

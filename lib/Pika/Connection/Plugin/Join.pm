@@ -2,8 +2,9 @@ package Pika::Connection::Plugin::Join;
 
 # ABSTRACT: Auto Join Channel Plugin on Pika
 
-
+use Quick::Perl;
 use Moose;
+use namespace::autoclean;
 extends 'Pika::Connection::Plugin';
 with 'MooseX::Role::Pluggable::Plugin';
 
@@ -12,9 +13,8 @@ has channels => (
     isa => 'ArrayRef',
 );
 
-sub on_connect {
-    my ($self) = @_;
-    $self->connection->irc->send_srv(JOIN => $_) for @{$self->channels};
+method on_connect {
+    $self->connection->irc->send_srv("JOIN", '#pika-test');
     return $self->pass;
 }
 

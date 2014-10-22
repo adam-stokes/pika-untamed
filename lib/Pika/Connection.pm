@@ -4,8 +4,11 @@ package Pika::Connection;
 
 use Quick::Perl;
 use Moose;
+use Pika::Message;
 use AnyEvent::IRC::Client;
 use namespace::autoclean;
+
+with 'MooseX::Role::Pluggable';
 
 const my $IRC_DEFAULT_PORT => 6667;
 
@@ -22,9 +25,20 @@ has nickname => (
     required => 1
 );
 
+has realname => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1
+);
+
 has password => (
     is  => 'ro',
     isa => 'Str',
+);
+
+has ssl => (
+    is  => 'ro',
+    isa => 'Bool'
 );
 
 has port => (
@@ -79,7 +93,7 @@ method run {
                 return;
             }
 
-            warn "connected to: " . $self->server . ":" . $self->port
+            say "connected to: " . $self->server . ":" . $self->port
               if $Pika::DEBUG;
             $self->occur_event('on_connect');
         }
@@ -88,7 +102,7 @@ method run {
     $irc->reg_cb(
         irc_privmsg => sub {
             my ($con, $raw) = @_;
-            my $message = Horris::Message->new(
+            my $message = Pika::Message->new(
                 channel => $raw->{params}->[0],
                 message => $raw->{params}->[1],
                 from    => $raw->{prefix}
@@ -102,7 +116,7 @@ method run {
     $irc->reg_cb(
         privatemsg => sub {
             my ($con, $nick, $raw) = @_;
-            my $message = Horris::Message->new(
+            my $message = Pika::Message->new(
                 channel => '',
                 message => $raw->{params}->[1],
                 from    => defined $raw->{prefix} ? $raw->{prefix} : '',
@@ -111,13 +125,14 @@ method run {
         }
     );
 
+    $irc->enable_ssl() if $self->ssl;
     $irc->connect(
         $self->server,
         $self->port,
         {   nick     => $self->nickname,
             user     => $self->username,
             password => $self->password,
-            timeout  => 1,
+            real => $self->realname
         }
     );
 }
@@ -134,7 +149,7 @@ method irc_mode ($args) {
     $self->send_srv(MODE => $args->{channel} => $args->{mode}, $args->{who});
 }
 
-method occur_event ($event, @args) {
+method occur_event($event, @args) {
     my $plugins = $self->plugin_hash;
     my ($rev);
     foreach my $plugin_name (@{$self->plugins}) {

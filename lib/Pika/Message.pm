@@ -32,6 +32,7 @@ has timestamp => (
 __PACKAGE__->meta->make_immutable;
 
 package Pika::Message::Address;
+
 use Quick::Perl;
 use Moose;
 use namespace::autoclean;

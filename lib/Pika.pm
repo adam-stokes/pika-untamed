@@ -17,6 +17,7 @@ has condvar => (
 );
 
 has connections => (
+    traits  => ['Array'],
     is      => 'ro',
     isa     => 'ArrayRef[Pika::Connection]',
     lazy    => 1,
@@ -36,21 +37,21 @@ has config => (
 method _build_condvar { AnyEvent->condvar }
 
 method _build_connections {
-    my @connections;
+    my $connections = +[];
     while (my ($name, $conn) = each %{$self->{config}{connection}}) {
         confess "No network specified for connection '$name'"
           unless $conn->{network};
-        say "Loading connection: $name\n" if $Pika::DEBUG;
+        say "Loading connection: $name" if $Pika::DEBUG;
 
         my $network    = $self->{config}{network}->{$conn->{network}};
         my $connection = Pika::Connection->new(
             {   %$network, %$conn,
-                plugins => $conn->{loadmodule} ? $conn->{loadmodule} : [],
+                plugins => $conn->{loadmodule} ? [$conn->{loadmodule}] : [],
             }
         );
-        push @connections, $connection;
+        push @{ $connections }, $connection;
     }
-    return \@connections;
+    return $connections;
 }
 
 method run {

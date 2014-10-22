@@ -4,6 +4,7 @@ requires "Moose" => "0";
 requires "Moose::Util::TypeConstraints" => "0";
 requires "MooseX::App::Cmd" => "0";
 requires "MooseX::App::Cmd::Command" => "0";
+requires "MooseX::Role::Pluggable" => "0";
 requires "MooseX::Role::Pluggable::Plugin" => "0";
 requires "MooseX::SimpleConfig" => "0";
 requires "Quick::Perl" => "0";

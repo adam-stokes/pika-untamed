@@ -37,26 +37,11 @@ has done => (
     default => 1,
 );
 
-sub init {
-    my ($self, $conn) = @_;
+method init($conn) {
     my $pname = ref $self;
-    print $pname, " on - ", $self->is_enable ? 'enable' : 'disable', "\n"
+    say $pname, " on - ", $self->is_enable ? 'enable' : 'disable'
       if $Pika::DEBUG;
     $self->_connection($conn);
 }
-
-around BUILDARGS => sub {
-    my ($orig, $class, @args) = @_;
-    my $self         = $class->$orig(@args);
-    my @reserve_keys = qw/parent name/;
-    while (my ($key, $value) = each %{$self->{parent}{plugin}{$self->{name}}})
-    {
-        confess 'keys [' . join(', ', @reserve_keys) . "] are reserved\n"
-          if grep { $key eq $_ } @reserve_keys;
-        $self->{$key} = $value;
-    }
-
-    return $self;
-};
 
 __PACKAGE__->meta->make_immutable;
