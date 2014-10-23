@@ -108,7 +108,6 @@ method run {
                 from    => $raw->{prefix}
             );
 
-            $self->occur_event('irc_privmsg', $message)
               if $message->from->nickname ne $self->nickname;    # loop guard
         }
     );
@@ -154,6 +153,7 @@ method occur_event($event, @args) {
     my ($rev);
     foreach my $plugin_name (@{$self->plugins}) {
         my $plugin = $plugins->{$plugin_name};
+        print Dumper($plugin->channels);
         $rev = $plugin->$event(@args) if $plugin->can($event);
 
         # Don't try next plugin for $event if current plugin returns true

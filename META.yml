@@ -39,4 +39,4 @@ requires:
   namespace::autoclean: '0'
 resources:
   repository: git://github.com/battlemidget/pika
-version: 0.0.3
+version: 0.0.4

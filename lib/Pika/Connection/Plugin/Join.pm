@@ -14,6 +14,7 @@ has channels => (
 );
 
 method on_connect {
+  print Dumper($self->channels);
     $self->connection->irc->send_srv("JOIN", '#pika-test');
     return $self->pass;
 }
