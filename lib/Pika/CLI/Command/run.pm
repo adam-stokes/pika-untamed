@@ -5,9 +5,9 @@ package Pika::CLI::Command::run;
 use Quick::Perl;
 use Moose;
 use Pika;
-use namespace::autoclean;
 extends 'MooseX::App::Cmd::Command';
 with qw/MooseX::SimpleConfig/;
+use namespace::autoclean;
 
 has '+configfile' => (default => '/etc/pika.conf');
 

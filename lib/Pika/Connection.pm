@@ -4,88 +4,29 @@ package Pika::Connection;
 
 use Quick::Perl;
 use Moose;
+use Moose::Util qw(apply_all_roles is_role);
+use Module::Runtime qw(is_module_name use_package_optimistically);
 use Pika::Message;
-use AnyEvent::IRC::Client;
 use namespace::autoclean;
-
-with 'MooseX::Role::Pluggable';
 
 const my $IRC_DEFAULT_PORT => 6667;
 
-has irc => (
-    is      => 'rw',
-    isa     => 'AnyEvent::IRC::Client',
-    handles => {send_srv => 'send_srv'}
-);
-
-
-has nickname => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 1
-);
-
-has realname => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 1
-);
-
-has password => (
-    is  => 'ro',
-    isa => 'Str',
-);
-
-has ssl => (
-    is  => 'ro',
-    isa => 'Bool'
-);
-
-has port => (
-    is      => 'ro',
-    isa     => 'Str',
-    default => $IRC_DEFAULT_PORT,
-);
-
-has server => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 1
-);
-
-has username => (
-    is         => 'ro',
-    isa        => 'Str',
-    lazy_build => 1
-);
-
-has channels => (
-    is  => 'ro',
-    isa => 'ArrayRef[Str]',
-);
-
-# plugin's preference from configfle,
-# Pika::Connection::Plugin using it when all the plugins are initialize.
-has 'plugin' => (
-    traits  => ['Hash'],
-    is      => 'ro',
-    isa     => 'HashRef',
-    handles => {get_args => 'get'},
-);
+has irc      => (is => 'ro', isa => 'AnyEvent::IRC::Client');
+has nickname => (is => 'ro', isa => 'Str', required => 1);
+has realname => (is => 'ro', isa => 'Str', required => 1);
+has password => (is => 'ro', isa => 'Str',);
+has ssl      => (is => 'ro', isa => 'Bool');
+has port     => (is => 'ro', isa => 'Str', default => $IRC_DEFAULT_PORT);
+has server   => (is => 'ro', isa => 'Str', required => 1);
+has username =>
+  (is => 'ro', isa => 'Str', lazy => 1, builder => '_build_username');
+has plugin => (is => 'ro', isa => 'HashRef');
 
 method _build_username { $self->nickname }
 
 method run {
-    foreach my $plugin (@{$self->plugin_list})
-    { # WARNING: DO NOT CHANGE: plugin_list is lazy_build. it means initialize all the plugins at here.
-        $plugin->init($self);
-    }
-
-    my $irc = AnyEvent::IRC::Client->new();
-    $self->irc($irc);
-
-    $irc->reg_cb(disconnect => sub { $self->occur_event('on_disconnect'); });
-    $irc->reg_cb(
+    $self->irc->reg_cb(disconnect => sub { $self->occur_event('on_disconnect'); });
+    $self->irc->reg_cb(
         connect => sub {
             my ($con, $err) = @_;
             if (defined $err) {
@@ -99,7 +40,7 @@ method run {
         }
     );
 
-    $irc->reg_cb(
+    $self->irc->reg_cb(
         irc_privmsg => sub {
             my ($con, $raw) = @_;
             my $message = Pika::Message->new(
@@ -107,12 +48,12 @@ method run {
                 message => $raw->{params}->[1],
                 from    => $raw->{prefix}
             );
-
+            $self->occur_event('irc_privmsg', $message)
               if $message->from->nickname ne $self->nickname;    # loop guard
         }
     );
 
-    $irc->reg_cb(
+    $self->irc->reg_cb(
         privatemsg => sub {
             my ($con, $nick, $raw) = @_;
             my $message = Pika::Message->new(
@@ -124,36 +65,40 @@ method run {
         }
     );
 
-    $irc->enable_ssl() if $self->ssl;
-    $irc->connect(
+    $self->irc->enable_ssl() if $self->ssl;
+    $self->irc->connect(
         $self->server,
         $self->port,
         {   nick     => $self->nickname,
             user     => $self->username,
             password => $self->password,
-            real => $self->realname
+            real     => $self->realname
         }
     );
 }
 
 method irc_notice ($args) {
-    $self->send_srv(NOTICE => $args->{channel} => $args->{message});
+    $self->irc->send_srv(NOTICE => $args->{channel} => $args->{message});
 }
 
 method irc_privmsg ($args) {
-    $self->send_srv(PRIVMSG => $args->{channel} => $args->{message});
+    $self->irc->send_srv(PRIVMSG => $args->{channel} => $args->{message});
 }
 
 method irc_mode ($args) {
-    $self->send_srv(MODE => $args->{channel} => $args->{mode}, $args->{who});
+    $self->irc->send_srv(MODE => $args->{channel} => $args->{mode}, $args->{who});
 }
 
-method occur_event($event, @args) {
-    my $plugins = $self->plugin_hash;
-    my ($rev);
-    foreach my $plugin_name (@{$self->plugins}) {
-        my $plugin = $plugins->{$plugin_name};
-        print Dumper($plugin->channels);
+method occur_event ($event, @args) {
+    my ($rev, $class, $plugin);
+    # TODO: load this once and just access the method events
+    foreach my $plugin_name (keys %{$self->plugin}) {
+        $class = "Pika::Connection::Plugin::$plugin_name";
+        die "Failed to find plugin $plugin_name"
+          unless is_module_name($class);
+        $plugin =
+          use_package_optimistically($class)
+          ->new(irc => $self->irc, opts => $self->plugin->{$plugin_name});
         $rev = $plugin->$event(@args) if $plugin->can($event);
 
         # Don't try next plugin for $event if current plugin returns true

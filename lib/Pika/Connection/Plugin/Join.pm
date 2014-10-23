@@ -6,16 +6,11 @@ use Quick::Perl;
 use Moose;
 use namespace::autoclean;
 extends 'Pika::Connection::Plugin';
-with 'MooseX::Role::Pluggable::Plugin';
 
-has channels => (
-    is  => 'ro',
-    isa => 'ArrayRef',
-);
+has opts => (is => 'ro', isa => 'HashRef');
 
 method on_connect {
-  print Dumper($self->channels);
-    $self->connection->irc->send_srv("JOIN", '#pika-test');
+    $self->irc->send_srv("JOIN", $_) for @{$self->opts->{channels}};
     return $self->pass;
 }
 
