@@ -4,4 +4,4 @@
 # ABSTRACT: pika cli
 
 use Pika::CLI;
-Pika::CLI->run;
+Pika::CLI->new_with_command->run;

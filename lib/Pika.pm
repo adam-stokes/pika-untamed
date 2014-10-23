@@ -37,17 +37,38 @@ method _build_irc { AnyEvent::IRC::Client->new }
 
 method _build_connections {
     my $connections = +[];
-    while (my ($name, $conn) = each %{$self->config->{connection}}) {
-        confess "No network specified for connection '$name'"
+    my $plugins     = +[];
+    foreach my $conn (@{$self->config->{connection}}) {
+        confess "No networks found."
           unless $conn->{network};
-        say "Loading connection: $name" if $Pika::DEBUG;
-        my $network = $self->config->{network}->{$conn->{network}};
-        my $connection =
-          Pika::Connection->new({%$network, %$conn, irc => $self->irc});
-        push @{$connections}, $connection;
+
+        #foreach my $network (keys %{$conn->{network}}) {
+        $conn->{network}->each(
+            func {
+                print Dumper($_);
+                say "Loading connection: $_" if $Pika::DEBUG;
+                my $server = $self->config->{network}->{$_};
+
+                # handle registered plugins
+                $server->{plugins}->foreach(
+                    func {
+                        push @{$plugins}, $self->config->{plugins}->{$_}
+                    }
+                );
+
+                my $connection =
+                  Pika::Connection->new(
+                    {%$server, %$self->config->{plugins}, irc => $self->irc});
+                $connections->push($connection);
+
+            }
+        );
+
+        #}
     }
     return $connections;
 }
+
 
 method run {
     my $cv = $self->cv;

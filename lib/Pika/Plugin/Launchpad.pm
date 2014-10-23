@@ -1,15 +1,14 @@
-package Pika::Connection::Plugin::Launchpad;
+package Pika::Plugin::Launchpad;
 
 # ABSTRACT: Launchpad.net Plugin
 
 use Quick::Perl;
 use Moose;
-use List::AllUtils qw(first);
 use IRC::Utils qw(:ALL);
 use Net::Launchpad::Client;
 use Net::Launchpad::Model;
 use namespace::autoclean;
-extends 'Pika::Connection::Plugin';
+extends 'Pika::Plugin';
 
 has consumer_key        => (is => 'ro', isa => 'Str');
 has access_token        => (is => 'ro', isa => 'Str');
@@ -42,18 +41,26 @@ method _build_lpc {
 
 method irc_privmsg ($msg) {
     if (my (@bug_id) = $msg->message =~ m/(bug|#|LP|lp)\s*#?(\d{6,})/i) {
-        my $bug = $self->model->bug($bug_id[1]);
-
+        my $bug     = $self->model->bug($bug_id[1]);
+        my $bugtask = $bug->tasks->head;
         $self->do_notice(
             {   channel => $msg->channel,
-                message => join(" ",
+                message => join(
+                    " ",
                     '('
                       . UNDERLINE
                       . BOLD
                       . $bug->result->{information_type}
                       . NORMAL . ')',
                     $bug->result->{title},
-                    $bug->result->{web_link})
+                    '['
+                      . BOLD
+                      . $bugtask->{importance} . ','
+                      . $bugtask->{status}
+                      . BOLD . ']',
+
+                    $bug->result->{web_link}
+                )
             }
         );
     }

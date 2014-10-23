@@ -1,11 +1,11 @@
-package Pika::Connection::Plugin::Join;
+package Pika::Plugin::Join;
 
 # ABSTRACT: Auto Join Channel Plugin on Pika
 
 use Quick::Perl;
 use Moose;
 use namespace::autoclean;
-extends 'Pika::Connection::Plugin';
+extends 'Pika::Plugin';
 
 has channels => (is => 'ro', isa => 'ArrayRef');
 

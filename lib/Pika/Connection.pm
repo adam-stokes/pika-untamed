@@ -20,11 +20,11 @@ has port     => (is => 'ro', isa => 'Str', default => $IRC_DEFAULT_PORT);
 has server   => (is => 'ro', isa => 'Str', required => 1);
 has username =>
   (is => 'ro', isa => 'Str', lazy => 1, builder => '_build_username');
-has plugin => (is => 'ro', isa => 'HashRef');
+has plugins => (is => 'ro', isa => 'HashRef');
 has loaded_plugins => (
     traits  => ['Array'],
     is      => 'ro',
-    isa     => 'ArrayRef[Pika::Connection::Plugin]',
+    isa     => 'ArrayRef[Pika::Plugin]',
     lazy    => 1,
     builder => '_build_loaded_plugins',
     handles => {
@@ -42,7 +42,7 @@ method _build_loaded_plugins {
 
     # TODO: load this once and just access the method events
     foreach my $plugin_name (keys %{$self->plugin}) {
-        $class = "Pika::Connection::Plugin::$plugin_name";
+        $class = "Pika::Plugin::$plugin_name";
         die "Failed to find plugin $plugin_name"
           unless is_module_name($class);
         $plugin =

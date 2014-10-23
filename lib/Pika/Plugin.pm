@@ -1,4 +1,4 @@
-package Pika::Connection::Plugin;
+package Pika::Plugin;
 
 # ABSTRACT: Base Package of Plugins
 
