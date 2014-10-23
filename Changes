@@ -3,8 +3,16 @@ Changes from 2013-10-23 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.0.5 at 2014-10-23 17:31:44 +0000
+version 0.0.5 at 2014-10-23 17:40:44 +0000
 ------------------------------------------
+
+  Change: 6de7a9a063e5f34a971319577e7c491c2104ad67
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-23 13:38:45 +0000
+
+    re-work cli args
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
 
   Change: 6eb7ed1d0947fd34f5b76f09145795be64b37634
   Author: Adam Stokes <adam.stokes@ubuntu.com>

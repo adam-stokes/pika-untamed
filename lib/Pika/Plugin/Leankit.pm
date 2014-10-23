@@ -1,4 +1,4 @@
-package Pika::Plugin::LeanKit;
+package Pika::Plugin::Leankit;
 
 # ABSTRACT: LeanKit.net Plugin
 
@@ -42,12 +42,15 @@ method irc_privmsg ($msg) {
     my ($board_by_name) = $msg->message =~ m/^leankit board (.*)/i;
     my ($help)          = $msg->message =~ m/^leankit help$/i;
 
-    $self->do_notice(
-        {   channel => $msg->channel,
-            message => 'not implemented yet.'
-        }
-    );
-
+    if ($help) {
+        $self->do_notice(
+            {   channel => $msg->channel,
+                message => "Usage leankit [add card|rm card|add default|rm default"
+              . "|show default|boards|board]"
+            }
+        );
+        return $self->pass;
+    }
     return $self->pass;
 }
 

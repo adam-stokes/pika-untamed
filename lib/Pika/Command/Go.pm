@@ -1,4 +1,4 @@
-package Pika::CLI::Command::Go;
+package Pika::Command::Go;
 
 # ABSTRACT: Pika runner
 
@@ -10,7 +10,7 @@ use Moose;
 use MooseX::App::Command;
 use namespace::autoclean;
 
-parameter 'conf' => (
+option 'conf' => (
     is            => 'ro',
     required      => 1,
     documentation => 'configuration file'
@@ -23,11 +23,13 @@ has configuration => (
 );
 
 method _build_conf {
-    return Config::Any->load_files({files => [$self->conf], use_ext => 1});
+    my $files = Config::Any->load_files({files => [$self->conf], use_ext => 1});
+    $files = shift @{$files} || {};
+    return $files->{$self->conf};
 }
 
 method run {
-    my $pika = Pika->new(config => $self->config);
+    my $pika = Pika->new(config => $self->configuration);
     $pika->run;
 }
 

@@ -41,13 +41,13 @@ method _build_loaded_plugins {
     my ($rev, $class, $plugin);
 
     # TODO: load this once and just access the method events
-    foreach my $plugin_name (keys %{$self->plugin}) {
+    foreach my $plugin_name (keys %{$self->plugins}) {
         $class = "Pika::Plugin::$plugin_name";
         die "Failed to find plugin $plugin_name"
           unless is_module_name($class);
         $plugin =
           use_package_optimistically($class)
-          ->new({%{$self->plugin->{$plugin_name}}, irc => $self->irc});
+          ->new({%{$self->plugins->{$plugin_name}}, irc => $self->irc});
         push @{$plugins}, $plugin;
         say "Loaded plugin: " . $plugin_name if $Pika::DEBUG;
     }

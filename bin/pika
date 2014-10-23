@@ -3,5 +3,5 @@
 # PODNAME: pikachu!
 # ABSTRACT: pika cli
 
-use Pika::CLI;
-Pika::CLI->new_with_command->run;
+use Pika::Command;
+Pika::Command->new_with_command->run;
