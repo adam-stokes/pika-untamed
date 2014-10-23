@@ -23,8 +23,4 @@ has done => (
     default => 1,
 );
 
-method BUILD {
-  say "loading ". ref $self;
-}
-
 __PACKAGE__->meta->make_immutable;

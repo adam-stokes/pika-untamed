@@ -21,8 +21,38 @@ has server   => (is => 'ro', isa => 'Str', required => 1);
 has username =>
   (is => 'ro', isa => 'Str', lazy => 1, builder => '_build_username');
 has plugin => (is => 'ro', isa => 'HashRef');
+has loaded_plugins => (
+    traits  => ['Array'],
+    is      => 'ro',
+    isa     => 'ArrayRef[Pika::Connection::Plugin]',
+    lazy    => 1,
+    builder => '_build_loaded_plugins',
+    handles => {
+        all_plugins => 'elements',
+        push_plugin => 'push'
+    }
+);
+
 
 method _build_username { $self->nickname }
+
+method _build_loaded_plugins {
+    my $plugins = +[];
+    my ($rev, $class, $plugin);
+
+    # TODO: load this once and just access the method events
+    foreach my $plugin_name (keys %{$self->plugin}) {
+        $class = "Pika::Connection::Plugin::$plugin_name";
+        die "Failed to find plugin $plugin_name"
+          unless is_module_name($class);
+        $plugin =
+          use_package_optimistically($class)
+          ->new(irc => $self->irc, opts => $self->plugin->{$plugin_name});
+        push @{$plugins}, $plugin;
+        say "Loaded plugin: " . $plugin_name if $Pika::DEBUG;
+    }
+    return $plugins;
+}
 
 method run {
     $self->irc->reg_cb(disconnect => sub { $self->occur_event('on_disconnect'); });
@@ -77,6 +107,7 @@ method run {
     );
 }
 
+# TODO: Turn these into roles
 method irc_notice ($args) {
     $self->irc->send_srv(NOTICE => $args->{channel} => $args->{message});
 }
@@ -90,15 +121,8 @@ method irc_mode ($args) {
 }
 
 method occur_event ($event, @args) {
-    my ($rev, $class, $plugin);
-    # TODO: load this once and just access the method events
-    foreach my $plugin_name (keys %{$self->plugin}) {
-        $class = "Pika::Connection::Plugin::$plugin_name";
-        die "Failed to find plugin $plugin_name"
-          unless is_module_name($class);
-        $plugin =
-          use_package_optimistically($class)
-          ->new(irc => $self->irc, opts => $self->plugin->{$plugin_name});
+    my ($rev);
+    foreach my $plugin ($self->all_plugins) {
         $rev = $plugin->$event(@args) if $plugin->can($event);
 
         # Don't try next plugin for $event if current plugin returns true

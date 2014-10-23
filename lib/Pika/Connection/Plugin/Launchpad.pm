@@ -9,13 +9,10 @@ extends 'Pika::Connection::Plugin';
 
 has opts => (is => 'ro', isa => 'HashRef');
 
-method irc_privmsg ($message) {
-    if ($message =~ /pikapika/) {
-        $self->irc->irc_privmsg(
-            {   channel => $message->channel,
-                message => "HAHA NO SOUP FOR YOU"
-            }
-        );
+method irc_privmsg ($msg) {
+    if ($msg->message =~ /pikapika/) {
+        $self->irc->send_srv(
+            PRIVMSG => $msg->channel => "HAHA NO SOUP FOR YOU");
     }
     return $self->pass;
 }
