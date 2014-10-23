@@ -47,7 +47,7 @@ method _build_loaded_plugins {
           unless is_module_name($class);
         $plugin =
           use_package_optimistically($class)
-          ->new(irc => $self->irc, opts => $self->plugin->{$plugin_name});
+          ->new({%{$self->plugin->{$plugin_name}}, irc => $self->irc});
         push @{$plugins}, $plugin;
         say "Loaded plugin: " . $plugin_name if $Pika::DEBUG;
     }
@@ -105,19 +105,6 @@ method run {
             real     => $self->realname
         }
     );
-}
-
-# TODO: Turn these into roles
-method irc_notice ($args) {
-    $self->irc->send_srv(NOTICE => $args->{channel} => $args->{message});
-}
-
-method irc_privmsg ($args) {
-    $self->irc->send_srv(PRIVMSG => $args->{channel} => $args->{message});
-}
-
-method irc_mode ($args) {
-    $self->irc->send_srv(MODE => $args->{channel} => $args->{mode}, $args->{who});
 }
 
 method occur_event ($event, @args) {

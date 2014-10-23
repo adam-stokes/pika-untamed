@@ -7,10 +7,10 @@ use Moose;
 use namespace::autoclean;
 extends 'Pika::Connection::Plugin';
 
-has opts => (is => 'ro', isa => 'HashRef');
+has channels => (is => 'ro', isa => 'ArrayRef');
 
 method on_connect {
-    $self->irc->send_srv("JOIN", $_) for @{$self->opts->{channels}};
+    $self->irc->send_srv("JOIN", $_) for @{$self->channels};
     return $self->pass;
 }
 
