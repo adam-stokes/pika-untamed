@@ -4,7 +4,7 @@ Pika - my tiny bot
 
 # VERSION
 
-version 0.0.5
+version 1.000
 
 # AUTHOR
 

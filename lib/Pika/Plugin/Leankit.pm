@@ -9,9 +9,11 @@ use Net::LeanKit;
 use namespace::autoclean;
 extends 'Pika::Plugin';
 
-has email    => (is => 'ro', isa => 'Str');
-has password => (is => 'ro', isa => 'Str');
-has account  => (is => 'ro', isa => 'Str');
+has email          => (is => 'ro', isa => 'Str');
+has password       => (is => 'ro', isa => 'Str');
+has account        => (is => 'ro', isa => 'Str');
+has def_board_id   => (is => 'rw', isa => 'Int', default => 0);
+has def_board_name => (is => 'rw', isa => 'Str');
 
 has lk => (
     is      => 'ro',
@@ -19,62 +21,6 @@ has lk => (
     lazy    => 1,
     builder => '_build_lk'
 );
-
-method BUILD {
-    my $lk_boards_sql = <<EOF;
-CREATE TABLE IF NOT EXISTS leankit_boards (
-	id INTEGER PRIMARY KEY ASC,
-	board_id INTEGER,
-	board_name TEXT
-);
-EOF
-    $self->db->process_plugin_sql($lk_boards_sql);
-}
-
-
-method get_default_board {
-    my ($stmt, @bind) = $self->db->sql->select(
-        -from  => 'leankit_boards',
-        -limit => 1
-    );
-    return $self->db->_run($stmt, \@bind, return_val => 'value_first');
-}
-
-=method set_default_board
-
-Sets default board to add cards against in the database
-
-=cut
-
-method set_default_board ($board_id) {
-    my ($stmt, @bind);
-    my $board = $self->lk->getBoards->first(func { $_->{Id} == $board_id });
-    my $curr_board = $self->get_default_board;
-    if (!$curr_board) {
-        ($stmt, @bind) = $self->db->sql->insert(
-            -into => 'leankit_boards',
-            -values =>
-              {board_id => $board->{Id}, board_name => $board->{Title}}
-        );
-        return $self->db->_run($stmt, \@bind, return_val => 'execute');
-    }
-    if ($curr_board->[1] != $board_id) {
-        ($stmt, @bind) = $self->db->sql->update(
-            -table => 'leankit_boards',
-            -set => {board_id => $board->{Id}, board_name => $board->{Title}},
-            -where => {board_id => $curr_board->[1]}
-        );
-        return $self->db->_run($stmt, \@bind, return_val => 'execute');
-    }
-}
-
-method rm_default_board ($board_id) {
-    my ($stmt, @bind) = $self->db->sql->delete(
-        -from  => 'leankit_boards',
-        -where => {board_id => $board_id}
-    );
-    return $self->db->_run($stmt, \@bind, return_val => 'execute');
-}
 
 
 method _build_lk {
@@ -85,6 +31,83 @@ method _build_lk {
     );
 }
 
+method BUILD {
+    my $lk_boards_sql = <<EOF;
+CREATE TABLE IF NOT EXISTS leankit_boards (
+	id INTEGER PRIMARY KEY ASC,
+	board_id INTEGER,
+	board_name TEXT
+);
+EOF
+    $self->db->process_plugin_sql($lk_boards_sql);
+    $self->get_default_board;
+}
+
+
+method get_default_board {
+    my ($stmt, @bind) = $self->db->sql->select(
+        -from  => 'leankit_boards',
+        -limit => 1
+    );
+    my $res = $self->db->_run($stmt, \@bind, return_val => 'value_first');
+    if ($res) {
+      $self->def_board_id($res->[1]);
+      $self->def_board_name($res->[2]);
+    }
+}
+
+=method set_default_board
+
+Sets default board to add cards against in the database
+
+=cut
+
+method set_default_board ($board_id) {
+    my ($stmt, @bind);
+
+    my $board =
+      $self->lk->getBoards->{content}->first(func { $_->{Id} == $board_id });
+
+    # Check if default board id is set
+    if (!$self->def_board_id) {
+        ($stmt, @bind) = $self->db->sql->insert(
+            -into   => 'leankit_boards',
+            -values => {
+                board_id   => $board->{Id},
+                board_name => $board->{Title}
+            }
+        );
+    }
+
+    # Update if new board id
+    if ($self->def_board_id != $board_id) {
+        ($stmt, @bind) = $self->db->sql->update(
+            -table => 'leankit_boards',
+            -set   => {
+                board_id   => $board->{Id},
+                board_name => $board->{Title}
+            },
+            -where => {board_id => $self->def_board_id}
+        );
+    }
+    $self->def_board_id($board->{Id});
+    $self->def_board_name($board->{Title});
+    return $self->db->_run($stmt, \@bind, return_val => 'execute');
+
+}
+
+method rm_default_board ($board_id) {
+    my ($stmt, @bind) = $self->db->sql->delete(
+        -from  => 'leankit_boards',
+        -where => {board_id => $board_id}
+    );
+    $self->def_board_id(0);
+    $self->def_board_name('');
+
+    return $self->db->_run($stmt, \@bind, return_val => 'execute');
+}
+
+
 method irc_privmsg ($msg) {
     return $self->pass unless $msg->message =~ /^leankit/;
 
@@ -93,13 +116,14 @@ method irc_privmsg ($msg) {
     my ($add_default) = $msg->message =~ m/^leankit add default (\d+)/i;
     my @add_card = $msg->message =~ m/^leankit add card\s+(\d+)?\s*(.*)$/i;
     my @rm_card =
-      $msg->message =~ m/^leankit rm card\s+(\d+)\s+(\d+)\s*(srsly)/i;
+      $msg->message =~ m/^leankit rm card\s+(\d+)\s+(\d+)\s*(srsly)?/i;
     my ($rm_default)    = $msg->message =~ m/^leankit rm default/i;
     my ($show_default)  = $msg->message =~ m/^leankit show default/i;
     my ($boards)        = $msg->message =~ m/^leankit boards$/i;
     my ($board_by_name) = $msg->message =~ m/^leankit board (.*)/i;
     my ($help)          = $msg->message =~ m/^leankit help$/i;
 
+    # Get help
     if ($help) {
         $self->do_notice(
             {   channel => $msg->channel,
@@ -110,8 +134,10 @@ method irc_privmsg ($msg) {
         );
         return $self->pass;
     }
+
+    # All boards action
     if ($boards) {
-        $self->lk->getBoards->sort->foreach(
+        $self->lk->getBoards->{content}->sort->foreach(
             func {
                 $self->do_privmsg(
                     {   channel => $msg->channel,
@@ -123,9 +149,11 @@ method irc_privmsg ($msg) {
         );
         return $self->pass;
     }
+
+    # Fuzzy search boards action
     if ($board_by_name) {
         my $board_query =
-          $self->lk->getBoards->grep(func { $_->{Title} =~ /$board_by_name/i }
+          $self->lk->getBoards->{content}->grep(func { $_->{Title} =~ /$board_by_name/i }
           );
         $self->do_privmsg(
             {   channel => $msg->channel,
@@ -145,11 +173,13 @@ method irc_privmsg ($msg) {
         );
         return $self->pass;
     }
+
+    # Show default board action
     if ($show_default) {
-        my $res = $self->get_default_board;
         my ($message);
-        if ($res) {
-            $message = sprintf("Default board (%s) %s", $res->[1], $res->[2]);
+        if ($self->def_board_id) {
+            $message = sprintf("Default board (%s) %s",
+                $self->def_board_id, $self->def_board_name);
         }
         else {
             $message = "No default board found, please set one ..";
@@ -161,10 +191,19 @@ method irc_privmsg ($msg) {
         );
         return $self->pass;
     }
+
+    # Remove default board action
     if ($rm_default) {
-        my $curr_board = $self->get_default_board;
-        $self->rm_default_board($curr_board->[1])
-          unless !$curr_board;
+        if (!$self->def_board_id) {
+            $self->do_privmsg(
+                {   channel => $msg->channel,
+                    message => 'No default board set ..'
+                }
+            );
+            return $self->pass;
+
+        }
+        $self->rm_default_board($self->def_board_id);
         $self->do_privmsg(
             {   channel => $msg->channel,
                 message => 'Default board unset ..'
@@ -183,10 +222,9 @@ method irc_privmsg ($msg) {
     }
     if (@add_card) {
         my ($add_card_boardid, $add_card_msg) = @add_card;
-        my ($res);
-        $res = $self->get_default_board;
-        if (!$add_card_boardid && $res) {
-            $add_card_boardid = $res->[1];
+        my ($res, $message);
+        if (!$add_card_boardid && $self->def_board_id) {
+            $add_card_boardid = $self->def_board_id;
         }
 
         if (!$add_card_boardid) {
@@ -200,10 +238,10 @@ method irc_privmsg ($msg) {
 
         # Retrieve card type and drop lane
         my $board = $self->lk->getBoard($add_card_boardid);
-        my $cardType = $board->{CardTypes}->first(func { $_->{IsDefault} });
-        my $lane = $board->{Lanes}->first(func { $_->{IsDefaultDropLane} });
+        my $cardType = $board->{content}->{CardTypes}->first(func { $_->{IsDefault} });
+        my $lane = $board->{content}->{Lanes}->first(func { $_->{IsDefaultDropLane} });
         if (!$lane) {
-            $lane = $board->{Backlog};
+            $lane = $board->{content}->{Backlog};
         }
 
         my $card_attributes = {
@@ -213,23 +251,33 @@ method irc_privmsg ($msg) {
             'Priority'       => 1
         };
 
-        print Dumper($card_attributes) if $Pika::DEBUG;
+        $res =
+          $self->lk->addCard($board->{content}->{Id}, $lane->{Id}, 0, $card_attributes);
 
-        $self->lk->addCard($board->{Id}, $lane->{Id}, 0, $card_attributes);
-
+        if ($res->{code} == 201) {
+            $message = sprintf(
+                "Added (%s) to board (%s) lane (%s) type (%s) card_id (%s)",
+                BOLD . $add_card_msg . NORMAL,
+                UNDERLINE . BOLD . $board->{content}->{Title} . NORMAL,
+                BOLD . $lane->{Title} . NORMAL,
+                BOLD . $cardType->{Name} . BOLD,
+                BOLD . $res->{content}->{CardId} . BOLD
+            );
+        }
+        else {
+            $message = sprintf("Problem adding card (%s)", $res->{status});
+        }
         $self->do_privmsg(
             {   channel => $msg->channel,
-                message => sprintf(
-                    "Added (%s) to board (%s) lane (%s) type (%s)",
-                    $add_card_msg, $res->[2], $lane->{Title}, $cardType->{Name}
-                )
+                message => $message
             }
         );
-
         return $self->pass;
+
     }
     if (@rm_card) {
         my ($board_id, $card_id, $serious) = @rm_card;
+        my ($res);
         if (!$serious) {
             $self->do_privmsg(
                 {   channel => $msg->channel,
@@ -239,13 +287,20 @@ method irc_privmsg ($msg) {
             );
             return $self->pass;
         }
-        $self->lk->deleteCard($board_id, $card_id);
-
-        $self->do_privmsg(
-            {   channel => $msg->channel,
-                message => "I have purged $card_id, you may rest e-z."
-            }
-        );
+        $res = $self->lk->deleteCard($board_id, $card_id);
+        if ($res->{code} == 203) {
+            $self->do_privmsg(
+                {   channel => $msg->channel,
+                    message => "I have purged $card_id, you may rest e-z."
+                }
+            );
+        } else {
+            $self->do_privmsg(
+                {   channel => $msg->channel,
+                    message => "Couldn't destroy $card_id: ". $res->{status}
+                }
+            );
+        }
         return $self->pass;
     }
 
