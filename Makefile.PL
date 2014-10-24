@@ -56,7 +56,6 @@ my %WriteMakefileArgs = (
     "Test::Kwalitee" => 0,
     "Test::Mojo" => 0,
     "Test::More" => 0,
-    "Test::NoTabs" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -94,7 +93,6 @@ my %FallbackPrereqs = (
   "Test::Kwalitee" => 0,
   "Test::Mojo" => 0,
   "Test::More" => 0,
-  "Test::NoTabs" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
   "warnings" => 0

@@ -1,10 +1,26 @@
 ==================================================
-Changes from 2013-10-23 00:00:00 +0000 to present.
+Changes from 2013-10-24 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.0.5 at 2014-10-23 22:35:57 +0000
+version 0.0.5 at 2014-10-24 01:19:07 +0000
 ------------------------------------------
+
+  Change: 0ba421a21869fa332b4be5954a0ae01de10b0d10
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-23 21:18:27 +0000
+
+    work on add card
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 8287c329c9dd9301ec387caeed9f66de7e26c286
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-23 20:35:09 +0000
+
+    add db support to plugins
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
 
   Change: 0bf251a422cf2a84b7568aaebcd62a9b94f73a4f
   Author: Adam Stokes <adam.stokes@ubuntu.com>

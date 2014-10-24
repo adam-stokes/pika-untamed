@@ -62,7 +62,7 @@ method set_default_board ($board_id) {
         ($stmt, @bind) = $self->db->sql->update(
             -table => 'leankit_boards',
             -set => {board_id => $board->{Id}, board_name => $board->{Title}},
-            -where => {id => $curr_board->{id}}
+            -where => {board_id => $curr_board->[1]}
         );
         return $self->db->_run($stmt, \@bind, return_val => 'execute');
     }
@@ -93,7 +93,7 @@ method irc_privmsg ($msg) {
     my ($add_default) = $msg->message =~ m/^leankit add default (\d+)/i;
     my @add_card = $msg->message =~ m/^leankit add card\s+(\d+)?\s*(.*)$/i;
     my @rm_card =
-      $msg->message =~ m/^leankit rm card\s+(\d+)\s+(\d+)?\s*(srsly)/i;
+      $msg->message =~ m/^leankit rm card\s+(\d+)\s+(\d+)\s*(srsly)/i;
     my ($rm_default)    = $msg->message =~ m/^leankit rm default/i;
     my ($show_default)  = $msg->message =~ m/^leankit show default/i;
     my ($boards)        = $msg->message =~ m/^leankit boards$/i;
@@ -182,36 +182,68 @@ method irc_privmsg ($msg) {
         return $self->pass;
     }
     if (@add_card) {
-      # TODO: Query for default drop lane
-        # my ($add_card_boardid, $add_card_msg) = @add_card;
-        # my $res = $self->get_default_board;
-        # if (!$add_card_boardid and !$res) {
-        #     $self->do_privmsg(
-        #         {   channel => $msg->channel,
-        #             message => 'No default board set and no board id found ..'
-        #         }
-        #     );
-        #     return $self->pass;
-        # }
-        # elsif ($add_card_boardid) {
-        #     $self->add_card($add_card_boardid, $add_card_msg);
-        # }
-        # else {
-        #     $self->add_card($res->[1], $add_card_msg);
-        # }
-        # $self->do_privmsg(
-        #     {   channel => $msg->channel,
-        #         message => sprintf("Added (%s) to board (%s)",
-        #             $add_card_msg, $res->[2])
-        #     }
-        # );
+        my ($add_card_boardid, $add_card_msg) = @add_card;
+        my ($res);
+        $res = $self->get_default_board;
+        if (!$add_card_boardid && $res) {
+            $add_card_boardid = $res->[1];
+        }
+
+        if (!$add_card_boardid) {
+            $self->do_privmsg(
+                {   channel => $msg->channel,
+                    message => 'No default board set and no board id found ..'
+                }
+            );
+            return $self->pass;
+        }
+
+        # Retrieve card type and drop lane
+        my $board = $self->lk->getBoard($add_card_boardid);
+        my $cardType = $board->{CardTypes}->first(func { $_->{IsDefault} });
+        my $lane = $board->{Lanes}->first(func { $_->{IsDefaultDropLane} });
+        if (!$lane) {
+            $lane = $board->{Backlog};
+        }
+
+        my $card_attributes = {
+            'TypeId'         => $cardType->{Id},
+            'Title'          => $add_card_msg,
+            'ExternalCardId' => time,
+            'Priority'       => 1
+        };
+
+        print Dumper($card_attributes) if $Pika::DEBUG;
+
+        $self->lk->addCard($board->{Id}, $lane->{Id}, 0, $card_attributes);
+
+        $self->do_privmsg(
+            {   channel => $msg->channel,
+                message => sprintf(
+                    "Added (%s) to board (%s) lane (%s) type (%s)",
+                    $add_card_msg, $res->[2], $lane->{Title}, $cardType->{Name}
+                )
+            }
+        );
 
         return $self->pass;
     }
     if (@rm_card) {
+        my ($board_id, $card_id, $serious) = @rm_card;
+        if (!$serious) {
+            $self->do_privmsg(
+                {   channel => $msg->channel,
+                    message =>
+                      "I dont trust you, add 'srsly' to the end if you really wanted this."
+                }
+            );
+            return $self->pass;
+        }
+        $self->lk->deleteCard($board_id, $card_id);
+
         $self->do_privmsg(
             {   channel => $msg->channel,
-                message => 'not implemented yet.'
+                message => "I have purged $card_id, you may rest e-z."
             }
         );
         return $self->pass;

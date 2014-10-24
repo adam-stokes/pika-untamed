@@ -27,7 +27,6 @@ on 'test' => sub {
   requires "Test::Kwalitee" => "0";
   requires "Test::Mojo" => "0";
   requires "Test::More" => "0";
-  requires "Test::NoTabs" => "0";
   requires "perl" => "5.008";
   requires "strict" => "0";
   requires "warnings" => "0";
@@ -44,6 +43,4 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Test::Kwalitee" => "1.21";
-  requires "Test::More" => "0";
-  requires "Test::NoTabs" => "0";
 };
