@@ -3,6 +3,7 @@ abstract: 'my tiny bot'
 author:
   - 'Adam Stokes <adamjs@cpan.org>'
 build_requires:
+  DBD::SQLite: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
@@ -12,7 +13,7 @@ build_requires:
   Test::Mojo: '0'
   Test::More: '0'
   Test::NoTabs: '0'
-  perl: '5.006'
+  perl: '5.008'
   strict: '0'
   warnings: '0'
 configure_requires:
@@ -29,6 +30,7 @@ requires:
   AnyEvent: '0'
   AnyEvent::IRC::Client: '0'
   Config::Any: '0'
+  DBI: '0'
   IRC::Utils: '0'
   Module::Runtime: '0'
   Moose: '0'
@@ -40,7 +42,11 @@ requires:
   Net::Launchpad::Model: '0'
   Net::LeanKit: '0'
   Quick::Perl: '0'
+  SQL::Abstract::More: '0'
   namespace::autoclean: '0'
+  perl: '5.008'
 resources:
-  repository: git://github.com/battlemidget/pika
+  homepage: https://github.com/battlemidget/pika
+  repository: https://github.com/battlemidget/pika.git
 version: 0.0.5
+x_authority: cpan:ADAMJS

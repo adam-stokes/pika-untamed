@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -25,12 +25,13 @@ my %WriteMakefileArgs = (
     "bin/pika"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Pika",
   "PREREQ_PM" => {
     "AnyEvent" => 0,
     "AnyEvent::IRC::Client" => 0,
     "Config::Any" => 0,
+    "DBI" => 0,
     "IRC::Utils" => 0,
     "Module::Runtime" => 0,
     "Moose" => 0,
@@ -42,9 +43,11 @@ my %WriteMakefileArgs = (
     "Net::Launchpad::Model" => 0,
     "Net::LeanKit" => 0,
     "Quick::Perl" => 0,
+    "SQL::Abstract::More" => 0,
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
+    "DBD::SQLite" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
@@ -68,6 +71,8 @@ my %FallbackPrereqs = (
   "AnyEvent" => 0,
   "AnyEvent::IRC::Client" => 0,
   "Config::Any" => 0,
+  "DBD::SQLite" => 0,
+  "DBI" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::ShareDir::Install" => "0.06",
   "File::Spec" => 0,
@@ -84,6 +89,7 @@ my %FallbackPrereqs = (
   "Net::Launchpad::Model" => 0,
   "Net::LeanKit" => 0,
   "Quick::Perl" => 0,
+  "SQL::Abstract::More" => 0,
   "Test::Compile" => 0,
   "Test::Kwalitee" => 0,
   "Test::Mojo" => 0,
