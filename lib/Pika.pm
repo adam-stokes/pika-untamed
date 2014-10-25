@@ -48,10 +48,10 @@ method _build_connections {
                 my $server = $_[1];
 
                 # handle registered plugins
-                $server->{plugins}->foreach(
+                $server->{plugins}->each(
                     func {
                         $plugins->{ucfirst $_[0]} =
-                          $self->config->{plugins}->{$_[0]};
+                          $server->{plugins}->{$_[0]};
                     }
                 );
                 my $connection =

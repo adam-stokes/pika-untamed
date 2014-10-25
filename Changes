@@ -1,10 +1,28 @@
 ==================================================
-Changes from 2013-10-24 00:00:00 +0000 to present.
+Changes from 2013-10-25 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.000 at 2014-10-24 04:22:34 +0000
+version 1.001 at 2014-10-25 17:34:20 +0000
 ------------------------------------------
+
+  Change: 5aafe3c2b8cc85e8ad96cba22a682322b8129717
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-24 00:29:26 +0000
+
+    updated sample config
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+------------------------------------------
+version 1.000 at 2014-10-24 04:22:45 +0000
+------------------------------------------
+
+  Change: 0066e5d3f763062c06adb6cfac261b9510e6bd84
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-24 00:22:45 +0000
+
+    v1.000 
 
   Change: 644ab2e9d19cd232c8902cbead80a1cd713e22e5
   Author: Adam Stokes <adam.stokes@ubuntu.com>
