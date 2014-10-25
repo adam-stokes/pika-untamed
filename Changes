@@ -3,8 +3,16 @@ Changes from 2013-10-25 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.001 at 2014-10-25 17:34:20 +0000
+version 1.001 at 2014-10-25 18:44:03 +0000
 ------------------------------------------
+
+  Change: f2922ebaf79ec44188f4cef92c40db5cffb7e14a
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-25 14:43:40 +0000
+
+    embed plugin config within their network
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
 
   Change: 5aafe3c2b8cc85e8ad96cba22a682322b8129717
   Author: Adam Stokes <adam.stokes@ubuntu.com>
