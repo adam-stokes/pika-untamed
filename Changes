@@ -1,10 +1,28 @@
 ==================================================
-Changes from 2013-10-25 00:00:00 +0000 to present.
+Changes from 2013-10-31 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.001 at 2014-10-25 18:44:03 +0000
+version 1.002 at 2014-10-31 01:53:19 +0000
 ------------------------------------------
+
+  Change: 4c7f216faf14aada0a89cb4bf6025dd35c1050cd
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-30 21:52:48 +0000
+
+    support launchpad urls
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+------------------------------------------
+version 1.001 at 2014-10-25 18:44:14 +0000
+------------------------------------------
+
+  Change: 22b093f49f2c9b6dda5d06d72b376dd5025656b0
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-25 14:44:14 +0000
+
+    v1.001 
 
   Change: f2922ebaf79ec44188f4cef92c40db5cffb7e14a
   Author: Adam Stokes <adam.stokes@ubuntu.com>
