@@ -39,31 +39,43 @@ method _build_lpc {
     );
 }
 
-method irc_privmsg ($msg) {
-    if (my (@bug_id) = $msg->message =~ m/(bug|#|LP|lp)\s*#?(\d{6,})/i) {
-        my $bug     = $self->model->bug($bug_id[1]);
-        my $bugtask = $bug->tasks->head;
-        $self->do_notice(
-            {   channel => $msg->channel,
-                message => join(
-                    " ",
-                    '('
-                      . UNDERLINE
-                      . BOLD
-                      . $bug->result->{information_type}
-                      . NORMAL . ')',
-                    $bug->result->{title},
-                    '['
-                      . BOLD
-                      . $bugtask->{importance} . ','
-                      . $bugtask->{status}
-                      . BOLD . ']',
+method _get_bug ($id) {
+    my $bug     = $self->model->bug($id);
+    my $bugtask = $bug->tasks->head;
+    return {result => $bug->result, task => $bugtask};
 
-                    $bug->result->{web_link}
-                )
-            }
-        );
+}
+
+method irc_privmsg ($msg) {
+    my ($bug, @bug_id);
+    if ((@bug_id) =
+        $msg->message =~ m/(https:\/\/.*launchpad\.net\/.*\/)(\d{6,})/i)
+    {
+        $bug = $self->_get_bug($bug_id[1]);
     }
+    if ((@bug_id) = $msg->message =~ m/(bug|#|LP|lp)\s*#?(\d{6,})/i) {
+        $bug = $self->_get_bug($bug_id[1]);
+    }
+    $self->do_notice(
+        {   channel => $msg->channel,
+            message => join(
+                " ",
+                '('
+                  . UNDERLINE
+                  . BOLD
+                  . $bug->{result}->{information_type}
+                  . NORMAL . ')',
+                $bug->{result}->{title},
+                '['
+                  . BOLD
+                  . $bug->{task}->{importance} . ','
+                  . $bug->{task}->{status}
+                  . BOLD . ']',
+
+                $bug->{result}->{web_link}
+            )
+        }
+    );
     return $self->pass;
 }
 
