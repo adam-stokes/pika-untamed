@@ -5,12 +5,20 @@ package Pika::Plugin;
 use Quick::Perl;
 use Moose;
 use Pika::Plugin::DB;
+use Log::Dispatch;
 use namespace::autoclean;
 
 has irc => (
     is  => 'ro',
     isa => 'AnyEvent::IRC::Client'
 );
+
+has log => (
+    is      => 'ro',
+    isa     => 'Log::Dispatch',
+    builder => '_build_log'
+);
+
 
 has db => (
     is      => 'ro',
@@ -35,6 +43,18 @@ method _build_db {
     return Pika::Plugin::DB->new;
 }
 
+method _build_log {
+    return Log::Dispatch->new(
+        outputs => [
+            [   'Screen',
+                min_level => 'debug',
+                stderr    => 1,
+                newline   => 1
+            ]
+        ],
+    );
+}
+
 method do_notice ($args) {
     $self->irc->send_srv(NOTICE => $args->{channel} => $args->{message});
 }
@@ -44,7 +64,10 @@ method do_privmsg ($args) {
 }
 
 method do_mode ($args) {
-    $self->irc->send_srv(MODE => $args->{channel} => $args->{mode}, $args->{who});
+    $self->irc->send_srv(
+        MODE => $args->{channel} => $args->{mode},
+        $args->{who}
+    );
 }
 
 __PACKAGE__->meta->make_immutable;

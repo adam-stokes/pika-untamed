@@ -49,7 +49,6 @@ method _build_loaded_plugins {
           use_package_optimistically($class)
           ->new({%{$self->plugins->{$plugin_name}}, irc => $self->irc});
         push @{$plugins}, $plugin;
-        say "Loaded plugin: " . $plugin_name if $Pika::DEBUG;
     }
     return $plugins;
 }

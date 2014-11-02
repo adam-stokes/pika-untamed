@@ -1,10 +1,28 @@
 ==================================================
-Changes from 2013-10-31 00:00:00 +0000 to present.
+Changes from 2013-11-02 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.003 at 2014-10-31 02:06:05 +0000
+version 1.004 at 2014-11-02 01:02:31 +0000
 ------------------------------------------
+
+  Change: 09ac74829ca9c100f1f1d61e7c9f5591bc64af23
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-31 22:50:17 +0000
+
+    bump requirements
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+------------------------------------------
+version 1.003 at 2014-10-31 02:06:16 +0000
+------------------------------------------
+
+  Change: 6d6a770f77d6c2d5691fbc1b5acd7d6b7b9d3492
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-30 22:06:16 +0000
+
+    v1.003 
 
   Change: f06a131bd60b45eb13acaece06ab358ff6bb4c51
   Author: Adam Stokes <adam.stokes@ubuntu.com>
