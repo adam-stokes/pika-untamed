@@ -1,4 +1,4 @@
-package Pika::Plugin::DB;
+package Pika::DB;
 
 # ABSTRACT: db interface for plugins
 
