@@ -10,9 +10,12 @@ primary_column channel_id => {
     is_auto_increment => 1
 };
 
+column server_id => {data_type => 'INT'};
+
 unique_column channel_name => {
     data_type => 'VARCHAR',
     size      => 255
 };
 
-has_many plugins => 'Pika::DB::Schema::Result::Plugin', 'channel_id';
+belongs_to server => 'Pika::DB::Schema::Result::Server', 'server_id';
+has_many plugins  => 'Pika::DB::Schema::Result::Plugin', 'channel_id';
