@@ -1,0 +1,233 @@
+---
+schema:
+  procedures: {}
+  tables:
+    channels:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - channel_id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - channel_name
+          match_type: ''
+          name: channels_channel_name
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+        - deferrable: 1
+          expression: ''
+          fields:
+            - server_id
+          match_type: ''
+          name: channels_fk_server_id
+          on_delete: CASCADE
+          on_update: CASCADE
+          options: []
+          reference_fields:
+            - server_id
+          reference_table: servers
+          type: FOREIGN KEY
+      fields:
+        channel_id:
+          data_type: INT
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: channel_id
+          order: 1
+          size:
+            - 0
+        channel_name:
+          data_type: VARCHAR
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: channel_name
+          order: 3
+          size:
+            - 255
+        server_id:
+          data_type: INT
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: server_id
+          order: 2
+          size:
+            - 0
+      indices:
+        - fields:
+            - server_id
+          name: channels_idx_server_id
+          options: []
+          type: NORMAL
+      name: channels
+      options: []
+      order: 2
+    plugins:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - plugin_id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - plugin_name
+          match_type: ''
+          name: plugins_plugin_name
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+        - deferrable: 1
+          expression: ''
+          fields:
+            - channel_id
+          match_type: ''
+          name: plugins_fk_channel_id
+          on_delete: CASCADE
+          on_update: CASCADE
+          options: []
+          reference_fields:
+            - channel_id
+          reference_table: channels
+          type: FOREIGN KEY
+      fields:
+        channel_id:
+          data_type: INT
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: channel_id
+          order: 2
+          size:
+            - 0
+        plugin_id:
+          data_type: INT
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: plugin_id
+          order: 1
+          size:
+            - 0
+        plugin_name:
+          data_type: VARCHAR
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: plugin_name
+          order: 3
+          size:
+            - 255
+      indices:
+        - fields:
+            - channel_id
+          name: plugins_idx_channel_id
+          options: []
+          type: NORMAL
+      name: plugins
+      options: []
+      order: 3
+    servers:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - server_id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - server_name
+          match_type: ''
+          name: servers_server_name
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+      fields:
+        server_id:
+          data_type: INT
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: server_id
+          order: 1
+          size:
+            - 0
+        server_name:
+          data_type: VARCHAR
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: server_name
+          order: 2
+          size:
+            - 255
+      indices: []
+      name: servers
+      options: []
+      order: 1
+  triggers: {}
+  views: {}
+translator:
+  add_drop_table: 0
+  filename: ~
+  no_comments: 0
+  parser_args:
+    sources:
+      - Channel
+      - Plugin
+      - Server
+  parser_type: SQL::Translator::Parser::DBIx::Class
+  producer_args: {}
+  producer_type: SQL::Translator::Producer::YAML
+  show_warnings: 0
+  trace: 0
+  version: 0.11020

@@ -20,7 +20,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 5.021, CPAN::Meta::Converter version 2.142690'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,8 +30,8 @@ requires:
   AnyEvent: '0'
   AnyEvent::IRC::Client: '0'
   Config::Any: '0'
-  DBI: '0'
   DBIx::Class::Candy: '0'
+  DBIx::Class::DeploymentHandler: '0'
   DBIx::Class::Schema: '0'
   IRC::Utils: '0'
   Log::Dispatch: '0'
@@ -46,7 +46,7 @@ requires:
   Net::LeanKit: '0'
   Pika::Plugin::DB: '0'
   Quick::Perl: '0'
-  SQL::Abstract::More: '0'
+  aliased: '0'
   base: '0'
   namespace::autoclean: '0'
   perl: '5.008'

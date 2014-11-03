@@ -31,19 +31,6 @@ method _build_lk {
     );
 }
 
-method BUILD {
-    my $lk_boards_sql = <<EOF;
-CREATE TABLE IF NOT EXISTS leankit_boards (
-	id INTEGER PRIMARY KEY ASC,
-	board_id INTEGER,
-	board_name TEXT
-);
-EOF
-    $self->db->process_plugin_sql($lk_boards_sql);
-    $self->get_default_board;
-}
-
-
 method get_default_board {
     my ($stmt, @bind) = $self->db->sql->select(
         -from  => 'leankit_boards',

@@ -18,3 +18,5 @@ unique_column plugin_name => {
 };
 
 belongs_to channel => 'Pika::DB::Schema::Result::Channel', 'channel_id';
+
+1;

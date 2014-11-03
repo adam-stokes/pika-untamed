@@ -16,3 +16,5 @@ unique_column server_name => {
 };
 
 has_many channels => 'Pika::DB::Schema::Result::Channel', 'server_id';
+
+1;

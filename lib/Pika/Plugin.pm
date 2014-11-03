@@ -5,20 +5,12 @@ package Pika::Plugin;
 use Quick::Perl;
 use Moose;
 use Pika::Plugin::DB;
-use Log::Dispatch;
 use namespace::autoclean;
 
 has irc => (
     is  => 'ro',
     isa => 'AnyEvent::IRC::Client'
 );
-
-has log => (
-    is      => 'ro',
-    isa     => 'Log::Dispatch',
-    builder => '_build_log'
-);
-
 
 has db => (
     is      => 'ro',
@@ -41,18 +33,6 @@ has done => (
 
 method _build_db {
     return Pika::Plugin::DB->new;
-}
-
-method _build_log {
-    return Log::Dispatch->new(
-        outputs => [
-            [   'Screen',
-                min_level => 'debug',
-                stderr    => 1,
-                newline   => 1
-            ]
-        ],
-    );
 }
 
 method do_notice ($args) {

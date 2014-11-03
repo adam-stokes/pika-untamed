@@ -5,10 +5,9 @@ package Pika::DB;
 use Quick::Perl;
 use Moose;
 use Pika::DB::Schema;
-use SQL::Abstract::More;
 use namespace::autoclean;
 
-has db => (is => 'ro', isa => 'Pika::DB::Schema', lazy => 1, builder => '_init_db');
+has schema => (is => 'ro', isa => 'Pika::DB::Schema', lazy => 1, builder => '_init_db');
 
 method _init_db {
     my $dbn = path('~/.pika.db');
