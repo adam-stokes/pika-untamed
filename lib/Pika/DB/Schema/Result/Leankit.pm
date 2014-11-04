@@ -12,11 +12,6 @@ primary_column leankit_id => {
 
 column server_id => {data_type => 'INT',};
 
-column plugin_name => {
-    data_type => 'VARCHAR',
-    size      => 255
-};
-
 column channel_name => {
     data_type => 'VARCHAR',
     size      => 255

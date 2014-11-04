@@ -8,6 +8,7 @@ requires "IRC::Utils" => "0";
 requires "Log::Dispatch" => "0";
 requires "Module::Runtime" => "0";
 requires "Moose" => "0";
+requires "Moose::Role" => "0";
 requires "Moose::Util" => "0";
 requires "Moose::Util::TypeConstraints" => "0";
 requires "MooseX::App" => "0";

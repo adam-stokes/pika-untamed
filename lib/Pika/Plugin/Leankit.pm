@@ -11,11 +11,9 @@ extends 'Pika::Plugin';
 
 has store =>
   (is => 'ro', isa => 'Object', lazy => 1, builder => '_build_store');
-has email          => (is => 'ro', isa => 'Str');
-has password       => (is => 'ro', isa => 'Str');
-has account        => (is => 'ro', isa => 'Str');
-has def_board_id   => (is => 'rw', isa => 'Int', default => 0);
-has def_board_name => (is => 'rw', isa => 'Str');
+has email    => (is => 'ro', isa => 'Str');
+has password => (is => 'ro', isa => 'Str');
+has account  => (is => 'ro', isa => 'Str');
 
 has lk => (
     is      => 'ro',
@@ -25,8 +23,7 @@ has lk => (
 );
 
 method _build_store {
-  my $session = $self->schema->resultset('Leankit');
-  print Dumper($session);
+    return $self->schema->resultset('Leankit');
 }
 
 method _build_lk {
@@ -38,15 +35,13 @@ method _build_lk {
 }
 
 method get_default_board ($channel) {
-    my ($stmt, @bind) = $self->db->sql->select(
-        -from  => 'leankit_boards',
-        -limit => 1
-    );
-    my $res = $self->db->_run($stmt, \@bind, return_val => 'value_first');
-    if ($res) {
-        $self->def_board_id($res->[1]);
-        $self->def_board_name($res->[2]);
-    }
+    my $board = $self->store->search(
+        {   channel_name            => $channel,
+            'server.server_network' => $self->irc->{host}
+        },
+        {join => 'server', rows => 1}
+    )->single;
+    return $board;
 }
 
 =method set_default_board
@@ -55,49 +50,32 @@ Sets default board to add cards against in the database
 
 =cut
 
-method set_default_board ($board_id) {
-    my ($stmt, @bind);
-
+method set_default_board ($channel, $board_id) {
     my $board =
       $self->lk->getBoards->{content}->first(func { $_->{Id} == $board_id });
 
-    # Check if default board id is set
-    if (!$self->def_board_id) {
-        ($stmt, @bind) = $self->db->sql->insert(
-            -into   => 'leankit_boards',
-            -values => {
-                board_id   => $board->{Id},
-                board_name => $board->{Title}
+    my $current_board = $self->get_default_board($channel);
+    if (!$current_board) {
+        $self->store->create(
+            {   default_board_id   => $board->{Id},
+                default_board_name => $board->{Title},
+                channel_name       => $channel,
+                server_id          => $self->server_record->server_id
             }
         );
     }
-
-    # Update if new board id
-    if ($self->def_board_id != $board_id) {
-        ($stmt, @bind) = $self->db->sql->update(
-            -table => 'leankit_boards',
-            -set   => {
-                board_id   => $board->{Id},
-                board_name => $board->{Title}
-            },
-            -where => {board_id => $self->def_board_id}
-        );
+    if ($current_board && $current_board->default_board_id != $board_id) {
+        $current_board->default_board_id   = $board->{Id};
+        $current_board->default_board_name = $board->{Title};
+        $current_board->update;
     }
-    $self->def_board_id($board->{Id});
-    $self->def_board_name($board->{Title});
-    return $self->db->_run($stmt, \@bind, return_val => 'execute');
-
 }
 
-method rm_default_board ($board_id) {
-    my ($stmt, @bind) = $self->db->sql->delete(
-        -from  => 'leankit_boards',
-        -where => {board_id => $board_id}
-    );
-    $self->def_board_id(0);
-    $self->def_board_name('');
-
-    return $self->db->_run($stmt, \@bind, return_val => 'execute');
+method rm_default_board ($channel) {
+    my $current_board = $self->get_default_board($channel);
+    if ($current_board) {
+        $self->store->delete;
+    }
 }
 
 
@@ -169,10 +147,11 @@ method irc_privmsg ($msg) {
 
     # Show default board action
     if ($show_default) {
+        my $board = $self->get_default_board($msg->channel);
         my ($message);
-        if ($self->def_board_id) {
+        if ($board) {
             $message = sprintf("Default board (%s) %s",
-                $self->def_board_id, $self->def_board_name);
+                $board->default_board_id, $board->default_board_name);
         }
         else {
             $message = "No default board found, please set one ..";
@@ -187,16 +166,7 @@ method irc_privmsg ($msg) {
 
     # Remove default board action
     if ($rm_default) {
-        if (!$self->def_board_id) {
-            $self->do_privmsg(
-                {   channel => $msg->channel,
-                    message => 'No default board set ..'
-                }
-            );
-            return $self->pass;
-
-        }
-        $self->rm_default_board($self->def_board_id);
+        $self->rm_default_board($msg->channel);
         $self->do_privmsg(
             {   channel => $msg->channel,
                 message => 'Default board unset ..'
@@ -205,7 +175,7 @@ method irc_privmsg ($msg) {
         return $self->pass;
     }
     if ($add_default) {
-        $self->set_default_board($add_default);
+        $self->set_default_board($msg->channel, $add_default);
         $self->do_privmsg(
             {   channel => $msg->channel,
                 message => 'Set default board id ' . $add_default

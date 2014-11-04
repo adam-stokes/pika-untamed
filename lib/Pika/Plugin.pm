@@ -40,5 +40,17 @@ method do_mode ($args) {
     );
 }
 
+=method server_record
+
+Gets current irc server to use with loaded plugins
+
+=cut
+
+method server_record {
+    my $res = $self->schema->resultset('Server')
+      ->search({server_network => $self->irc->{host}});
+    return $res->first;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;

@@ -3,8 +3,16 @@ Changes from 2013-11-04 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.005 at 2014-11-04 17:37:06 +0000
+version 1.005 at 2014-11-04 22:21:20 +0000
 ------------------------------------------
+
+  Change: 2e6aaedce888759181b23b9db4b0ef5a8de53645
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-11-04 15:08:41 +0000
+
+    add leankit db storage
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
 
   Change: 53234c50f0eea242ce7b38fb56b3e5e61cbdde13
   Author: Adam Stokes <adam.stokes@ubuntu.com>
