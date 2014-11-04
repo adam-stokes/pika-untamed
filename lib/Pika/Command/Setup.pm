@@ -12,8 +12,10 @@ use namespace::autoclean;
 
 method run {
     my $dh = DH->new(
-        {   schema           => $self->schema,
-            databases        => 'SQLite',
+        {   schema              => $self->schema,
+            databases           => 'SQLite',
+            script_directory    => 'lib/Pika/files/sql',
+            force_overwrite     => 1,
             sql_translator_args => {add_drop_table => 0}
         }
     );
