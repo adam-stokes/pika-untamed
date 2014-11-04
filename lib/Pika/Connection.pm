@@ -7,6 +7,7 @@ use Moose;
 use Moose::Util qw(apply_all_roles is_role);
 use Module::Runtime qw(is_module_name use_package_optimistically);
 use Pika::Message;
+extends('Pika::DB');
 use namespace::autoclean;
 
 const my $IRC_DEFAULT_PORT => 6667;

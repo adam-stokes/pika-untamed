@@ -1,10 +1,26 @@
 ==================================================
-Changes from 2013-11-03 00:00:00 +0000 to present.
+Changes from 2013-11-04 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.004 at 2014-11-03 19:00:34 +0000
+version 1.004 at 2014-11-04 17:19:26 +0000
 ------------------------------------------
+
+  Change: b74b196201ffddbda5841f6812021f32ff89c2ef
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-11-04 12:19:20 +0000
+
+    update schema
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 6ce69894f5175898b9a0b1a8f5e37e9ef30b09ec
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-11-03 14:33:13 +0000
+
+    more db work
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
 
   Change: 407a8f4dcb4c832363c294b6167d57da87cc2552
   Author: Adam Stokes <adam.stokes@ubuntu.com>

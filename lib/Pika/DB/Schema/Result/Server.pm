@@ -15,6 +15,11 @@ unique_column server_name => {
     size      => 255
 };
 
-has_many channels => 'Pika::DB::Schema::Result::Channel', 'server_id';
+column server_network => {
+    data_type => 'VARCHAR',
+    size      => 255
+};
+
+has_many plugins => 'Pika::DB::Schema::Result::Plugin', 'server_id';
 
 1;

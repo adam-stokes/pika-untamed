@@ -34,8 +34,8 @@ schema:
             - server_id
           match_type: ''
           name: channels_fk_server_id
-          on_delete: CASCADE
-          on_update: CASCADE
+          on_delete: ''
+          on_update: ''
           options: []
           reference_fields:
             - server_id
@@ -111,27 +111,17 @@ schema:
         - deferrable: 1
           expression: ''
           fields:
-            - channel_id
+            - server_id
           match_type: ''
-          name: plugins_fk_channel_id
+          name: plugins_fk_server_id
           on_delete: CASCADE
           on_update: CASCADE
           options: []
           reference_fields:
-            - channel_id
-          reference_table: channels
+            - server_id
+          reference_table: servers
           type: FOREIGN KEY
       fields:
-        channel_id:
-          data_type: INT
-          default_value: ~
-          is_nullable: 0
-          is_primary_key: 0
-          is_unique: 0
-          name: channel_id
-          order: 2
-          size:
-            - 0
         plugin_id:
           data_type: INT
           default_value: ~
@@ -153,10 +143,20 @@ schema:
           order: 3
           size:
             - 255
+        server_id:
+          data_type: INT
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: server_id
+          order: 2
+          size:
+            - 0
       indices:
         - fields:
-            - channel_id
-          name: plugins_idx_channel_id
+            - server_id
+          name: plugins_idx_server_id
           options: []
           type: NORMAL
       name: plugins
@@ -208,6 +208,16 @@ schema:
           is_unique: 1
           name: server_name
           order: 2
+          size:
+            - 255
+        server_network:
+          data_type: VARCHAR
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: server_network
+          order: 3
           size:
             - 255
       indices: []

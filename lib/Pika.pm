@@ -7,6 +7,7 @@ use Moose;
 use AnyEvent;
 use AnyEvent::IRC::Client;
 use Pika::Connection;
+extends('Pika::DB');
 use namespace::autoclean;
 
 const our $DEBUG => $ENV{PERL_PIKA_DEBUG};
@@ -33,7 +34,7 @@ has config => (
 );
 
 method _build_condvar { AnyEvent->condvar }
-method _build_irc { AnyEvent::IRC::Client->new }
+method _build_irc     { AnyEvent::IRC::Client->new }
 
 method _build_connections {
     my $connections = +[];
@@ -45,7 +46,18 @@ method _build_connections {
         $conn->{network}->each(
             func {
                 say "Loading connection: $_[0]" if $Pika::DEBUG;
+
+                # Add server to database
+                my $db_conn = $self->schema->resultset('Server')
+                  ->find({server_name => $_[0]});
                 my $server = $_[1];
+                if (!$db_conn) {
+                    $self->schema->resultset('Server')->create(
+                        {   server_name    => $_[0],
+                            server_network => $server->{server}
+                        }
+                    );
+                }
 
                 # handle registered plugins
                 $server->{plugins}->each(

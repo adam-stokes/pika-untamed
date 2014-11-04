@@ -6,13 +6,13 @@
                     username => 'pika',
                     nickname => 'pika',
                     realname => 'PIKAPIKA',
-                    plugins  => [qw(join)]
+                    plugins =>
+                      {join => {channels => ['#pika-test', '#pika-test2']},}
+
                 }
             }
         }
     ],
-    plugins => {
-        join    => {channels => ['#pika-test', '#pika-test2']},
-    }
 };
+
 
