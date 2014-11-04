@@ -20,6 +20,4 @@ column server_network => {
     size      => 255
 };
 
-has_many plugins => 'Pika::DB::Schema::Result::Plugin', 'server_id';
-
 1;

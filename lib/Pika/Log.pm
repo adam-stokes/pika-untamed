@@ -4,7 +4,7 @@ package Pika::Log;
 
 use Quick::Perl;
 use Log::Dispatch;
-use Moose;
+use Moose::Role;
 use namespace::autoclean;
 
 has log => (
@@ -25,5 +25,4 @@ method _build_log {
     );
 }
 
-
-__PACKAGE__->meta->make_immutable;
+1;

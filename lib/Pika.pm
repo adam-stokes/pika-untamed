@@ -8,6 +8,7 @@ use AnyEvent;
 use AnyEvent::IRC::Client;
 use Pika::Connection;
 extends('Pika::DB');
+with('Pika::Log');
 use namespace::autoclean;
 
 const our $DEBUG => $ENV{PERL_PIKA_DEBUG};
@@ -45,14 +46,16 @@ method _build_connections {
 
         $conn->{network}->each(
             func {
-                say "Loading connection: $_[0]" if $Pika::DEBUG;
+                $self->log->info("Loading connection: $_[0]");
 
                 # Add server to database
                 my $db_conn = $self->schema->resultset('Server')
                   ->find({server_name => $_[0]});
                 my $server = $_[1];
                 if (!$db_conn) {
-                    $self->schema->resultset('Server')->create(
+                    $self->log->info(
+                        "New connection found, storing in database.");
+                    $db_conn = $self->schema->resultset('Server')->create(
                         {   server_name    => $_[0],
                             server_network => $server->{server}
                         }
@@ -88,3 +91,4 @@ method run {
 }
 
 __PACKAGE__->meta->make_immutable;
+1;

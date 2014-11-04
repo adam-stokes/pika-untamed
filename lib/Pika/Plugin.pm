@@ -4,20 +4,14 @@ package Pika::Plugin;
 
 use Quick::Perl;
 use Moose;
-use Pika::Plugin::DB;
+extends('Pika::DB');
+with('Pika::Log');
 use namespace::autoclean;
 
 has irc => (
     is  => 'ro',
     isa => 'AnyEvent::IRC::Client'
 );
-
-has db => (
-    is      => 'ro',
-    isa     => 'Pika::Plugin::DB',
-    builder => '_build_db'
-);
-
 
 has pass => (
     is      => 'ro',
@@ -30,10 +24,6 @@ has done => (
     isa     => 'Int',
     default => 1,
 );
-
-method _build_db {
-    return Pika::Plugin::DB->new;
-}
 
 method do_notice ($args) {
     $self->irc->send_srv(NOTICE => $args->{channel} => $args->{message});
@@ -51,3 +41,4 @@ method do_mode ($args) {
 }
 
 __PACKAGE__->meta->make_immutable;
+1;

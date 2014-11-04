@@ -15,7 +15,6 @@ requires "MooseX::App::Command" => "0";
 requires "Net::Launchpad::Client" => "0";
 requires "Net::Launchpad::Model" => "0";
 requires "Net::LeanKit" => "0";
-requires "Pika::Plugin::DB" => "0";
 requires "Quick::Perl" => "0";
 requires "aliased" => "0";
 requires "base" => "0";

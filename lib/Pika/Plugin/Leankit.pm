@@ -9,6 +9,8 @@ use Net::LeanKit;
 use namespace::autoclean;
 extends 'Pika::Plugin';
 
+has store =>
+  (is => 'ro', isa => 'Object', lazy => 1, builder => '_build_store');
 has email          => (is => 'ro', isa => 'Str');
 has password       => (is => 'ro', isa => 'Str');
 has account        => (is => 'ro', isa => 'Str');
@@ -22,6 +24,10 @@ has lk => (
     builder => '_build_lk'
 );
 
+method _build_store {
+  my $session = $self->schema->resultset('Leankit');
+  print Dumper($session);
+}
 
 method _build_lk {
     return Net::LeanKit->new(
@@ -31,15 +37,15 @@ method _build_lk {
     );
 }
 
-method get_default_board {
+method get_default_board ($channel) {
     my ($stmt, @bind) = $self->db->sql->select(
         -from  => 'leankit_boards',
         -limit => 1
     );
     my $res = $self->db->_run($stmt, \@bind, return_val => 'value_first');
     if ($res) {
-      $self->def_board_id($res->[1]);
-      $self->def_board_name($res->[2]);
+        $self->def_board_id($res->[1]);
+        $self->def_board_name($res->[2]);
     }
 }
 
@@ -140,8 +146,8 @@ method irc_privmsg ($msg) {
     # Fuzzy search boards action
     if ($board_by_name) {
         my $board_query =
-          $self->lk->getBoards->{content}->grep(func { $_->{Title} =~ /$board_by_name/i }
-          );
+          $self->lk->getBoards->{content}
+          ->grep(func { $_->{Title} =~ /$board_by_name/i });
         $self->do_privmsg(
             {   channel => $msg->channel,
                 message => "Fuzzy searching $board_by_name ..."
@@ -225,8 +231,10 @@ method irc_privmsg ($msg) {
 
         # Retrieve card type and drop lane
         my $board = $self->lk->getBoard($add_card_boardid);
-        my $cardType = $board->{content}->{CardTypes}->first(func { $_->{IsDefault} });
-        my $lane = $board->{content}->{Lanes}->first(func { $_->{IsDefaultDropLane} });
+        my $cardType =
+          $board->{content}->{CardTypes}->first(func { $_->{IsDefault} });
+        my $lane =
+          $board->{content}->{Lanes}->first(func { $_->{IsDefaultDropLane} });
         if (!$lane) {
             $lane = $board->{content}->{Backlog};
         }
@@ -238,8 +246,8 @@ method irc_privmsg ($msg) {
             'Priority'       => 1
         };
 
-        $res =
-          $self->lk->addCard($board->{content}->{Id}, $lane->{Id}, 0, $card_attributes);
+        $res = $self->lk->addCard($board->{content}->{Id},
+            $lane->{Id}, 0, $card_attributes);
 
         if ($res->{code} == 201) {
             $message = sprintf(
@@ -281,10 +289,11 @@ method irc_privmsg ($msg) {
                     message => "I have purged $card_id, you may rest e-z."
                 }
             );
-        } else {
+        }
+        else {
             $self->do_privmsg(
                 {   channel => $msg->channel,
-                    message => "Couldn't destroy $card_id: ". $res->{status}
+                    message => "Couldn't destroy $card_id: " . $res->{status}
                 }
             );
         }
