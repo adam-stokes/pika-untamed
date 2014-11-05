@@ -186,8 +186,11 @@ method irc_privmsg ($msg) {
     if (@add_card) {
         my ($add_card_boardid, $add_card_msg) = @add_card;
         my ($res, $message);
-        if (!$add_card_boardid && $self->def_board_id) {
-            $add_card_boardid = $self->def_board_id;
+        if (!$add_card_boardid) {
+            my $_check_default = $self->get_default_board($msg->channel);
+            if ($_check_default) {
+                $add_card_boardid = $_check_default->default_board_id;
+            }
         }
 
         if (!$add_card_boardid) {

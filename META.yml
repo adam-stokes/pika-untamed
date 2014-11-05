@@ -53,5 +53,5 @@ requires:
 resources:
   homepage: https://github.com/battlemidget/pika
   repository: https://github.com/battlemidget/pika.git
-version: '1.005'
+version: '1.006'
 x_authority: cpan:ADAMJS
