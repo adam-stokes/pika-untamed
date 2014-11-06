@@ -15,3 +15,4 @@ method on_connect {
 }
 
 __PACKAGE__->meta->make_immutable;
+1;

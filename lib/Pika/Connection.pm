@@ -118,3 +118,4 @@ method occur_event ($event, @args) {
 }
 
 __PACKAGE__->meta->make_immutable;
+1;

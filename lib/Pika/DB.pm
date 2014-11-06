@@ -16,3 +16,4 @@ method _init_db {
 }
 
 __PACKAGE__->meta->make_immutable;
+1;
