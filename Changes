@@ -3,8 +3,16 @@ Changes from 2013-11-06 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.007 at 2014-11-06 04:38:24 +0000
+version 1.007 at 2014-11-06 04:46:22 +0000
 ------------------------------------------
+
+  Change: 437f99afb8525d6c6e25cb1cfbd456ba45787a25
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-11-05 23:38:31 +0000
+
+    bump ver
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
 
   Change: 44584c60a8e670e665269d852b3d50aeb6bd57b8
   Author: Adam Stokes <adam.stokes@ubuntu.com>
