@@ -1,10 +1,36 @@
 ==================================================
-Changes from 2013-11-05 00:00:00 +0000 to present.
+Changes from 2013-11-06 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.006 at 2014-11-05 00:17:38 +0000
+version 1.007 at 2014-11-06 04:38:24 +0000
 ------------------------------------------
+
+  Change: 44584c60a8e670e665269d852b3d50aeb6bd57b8
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-11-05 23:38:10 +0000
+
+    true unreliable
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 16fbefdd088c974edf2a1d709391f08b58b3bbc5
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-11-05 23:36:39 +0000
+
+    updated some regex
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+------------------------------------------
+version 1.006 at 2014-11-05 00:17:53 +0000
+------------------------------------------
+
+  Change: 3c6b160192fbec19a72269a37a5bb164f5076ec1
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-11-04 19:17:53 +0000
+
+    v1.006 
 
   Change: fa5e15166f23d47915fab6b44c4e6d75b2b2873e
   Author: Adam Stokes <adam.stokes@ubuntu.com>
