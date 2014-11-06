@@ -49,11 +49,11 @@ method _get_bug ($id) {
 method irc_privmsg ($msg) {
     my ($bug, @bug_id);
     if ((@bug_id) =
-        $msg->message =~ m/(https:\/\/(?:bugs\.)?launchpad\.net\/.*\/)(\d{6,})/i)
+        $msg->message =~ m/(https:\/\/(?:bugs\.)?launchpad\.net\/.*)(\d{6,})/i)
     {
         $bug = $self->_get_bug($bug_id[1]);
     }
-    elsif ((@bug_id) = $msg->message =~ m/(bug|#|LP|lp)\s*#?(\d{6,})/i) {
+    elsif ((@bug_id) = $msg->message =~ m/(bug|\#|LP|lp)\s*?(\d{6,})/i) {
         $bug = $self->_get_bug($bug_id[1]);
     }
     if ($bug) {
