@@ -20,7 +20,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 5.021, CPAN::Meta::Converter version 2.142690'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -53,5 +53,5 @@ requires:
 resources:
   homepage: https://github.com/battlemidget/pika
   repository: https://github.com/battlemidget/pika.git
-version: '1.007'
+version: '1.008'
 x_authority: cpan:ADAMJS
